@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ebao.ls.dao.UserDao">
+	<resultMap id="BaseResultMap" type="com.ebao.ls.vo.User">
+		<id column="user_id" property="userId" jdbcType="CHAR" />
+		<result column="user_name" property="userName" jdbcType="VARCHAR" />
+		<result column="user_birthday" property="userBirthday"
+			jdbcType="DATE" />
+		<result column="user_salary" property="userSalary" jdbcType="DOUBLE" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		user_id, user_name, user_birthday, user_salary
+	</sql>
+	<select id="all" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from t_user
+		where 1=1
+		<if test='_parameter.get("0").userName != null'>
+			and user_name like concat('%',#{0.userName,jdbcType=VARCHAR},'%')
+		</if>
+		<if test='_parameter.get("0").userId != null and _parameter.get("0").userId != ""'>
+			and user_id = #{0.userId,jdbcType=CHAR}
+		</if>
+		<if test='_parameter.get("0").userBirthday != null'>
+			and user_birthday = str_to_date(#{0.userBirthday,jdbcType=DATE}, '%Y-%m-%d')
+		</if>
+		<if test='_parameter.get("0").userSalary != null'>
+			and user_salary = #{0.userSalary,jdbcType=DOUBLE}
+		</if>
+		limit #{1},#{2}
+	</select>
+	<select id="allCount" parameterType="com.ebao.ls.vo.User" resultType="int">
+		select count(1) from t_user where 1=1
+		<if test="userName != null">
+			and user_name like concat('%',#{userName,jdbcType=VARCHAR},'%')
+		</if>
+		<if test="userId != null and userId != ''">
+			and user_id = #{userId,jdbcType=CHAR}
+		</if>
+		<if test="userBirthday != null">
+			and user_birthday = str_to_date(#{0.userBirthday,jdbcType=DATE}, '%Y-%m-%d')
+		</if>
+		<if test="userSalary != null">
+			and user_salary = #{userSalary,jdbcType=DOUBLE}
+		</if>
+	</select>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.String">
+		select
+		<include refid="Base_Column_List" />
+		from t_user
+		where user_id = #{userId,jdbcType=CHAR}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		delete from t_user
+		where user_id = #{userId,jdbcType=CHAR}
+	</delete>
+	<delete id="batchDelUsers">
+		delete from t_user where user_id in
+		<foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+                #{item}       
+        </foreach>  
+	</delete>
+	<insert id="insert" parameterType="com.ebao.ls.vo.User">
+		insert into t_user (user_id,
+		user_name, user_birthday,
+		user_salary)
+		values (#{userId,jdbcType=CHAR},
+		#{userName,jdbcType=VARCHAR},
+		str_to_date(#{userBirthday,jdbcType=DATE}, '%Y-%m-%d'),
+		#{userSalary,jdbcType=DOUBLE})
+	</insert>
+	<insert id="insertSelective" parameterType="com.ebao.ls.vo.User">
+		insert into t_user
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="userId != null">
+				user_id,
+			</if>
+			<if test="userName != null">
+				user_name,
+			</if>
+			<if test="userBirthday != null">
+				user_birthday,
+			</if>
+			<if test="userSalary != null">
+				user_salary,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="userId != null">
+				#{userId,jdbcType=CHAR},
+			</if>
+			<if test="userName != null">
+				#{userName,jdbcType=VARCHAR},
+			</if>
+			<if test="userBirthday != null">
+				str_to_date(#{userBirthday,jdbcType=DATE}, '%Y-%m-%d'),
+			</if>
+			<if test="userSalary != null">
+				#{userSalary,jdbcType=DOUBLE},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="com.ebao.ls.vo.User">
+		update t_user
+		<set>
+			<if test="userName != null">
+				user_name = #{userName,jdbcType=VARCHAR},
+			</if>
+			<if test="userBirthday != null">
+				user_birthday = str_to_date(#{userBirthday,jdbcType=DATE}, '%Y-%m-%d'),
+			</if>
+			<if test="userSalary != null">
+				user_salary = #{userSalary,jdbcType=DOUBLE},
+			</if>
+		</set>
+		where user_id = #{userId,jdbcType=CHAR}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="com.ebao.ls.vo.User">
+		update t_user
+		set
+		user_name = #{userName,jdbcType=VARCHAR},
+		user_birthday =
+		str_to_date(#{userBirthday,jdbcType=DATE}, '%Y-%m-%d'),
+		user_salary =
+		#{userSalary,jdbcType=DOUBLE}
+		where user_id = #{userId,jdbcType=CHAR}
+	</update>
+</mapper>
